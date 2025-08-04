@@ -1,9 +1,7 @@
-
 import 'package:estate/models/appartment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_payunit/flutter_payunit.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:intl/intl.dart';
  
 
@@ -27,7 +25,11 @@ class PaymentScreen extends StatefulWidget {
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
+enum PaymentOption { full, partial }
+
 class _PaymentScreenState extends State<PaymentScreen> {
+  // State to track the selected payment option
+  PaymentOption _selectedOption = PaymentOption.full;
 
   @override
   Widget build(BuildContext context) {
@@ -45,22 +47,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
           children: [
             _buildBookingDetails(),
             const SizedBox(height: 24),
-            Text('Ready to Pay?', style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Payment Options', style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              'Click the button below to proceed. You will be prompted to select a payment method (MTN, Orange, VISA).',
-              style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 15),
-            ),
+            _buildPaymentOptionsBoxes(), 
+            const SizedBox(height: 8),
+            _buildPaymentExplanation(),
           ],
         ),
       ),
-      // --- The PayUnitButton is now here ---
       bottomNavigationBar: _buildBottomPayButton(),
     );
   }
 
   Widget _buildBookingDetails() {
     final formatter = DateFormat('MMM d, yyyy');
+    final amountToPay = _selectedOption == PaymentOption.full ? widget.totalPrice : (widget.totalPrice / 3);
+    
     return Card(
       elevation: 0,
       color: Colors.grey[100],
@@ -85,10 +87,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Total (${widget.numberOfNights} nights)', style: GoogleFonts.poppins()),
+                Text('Amount to Pay Today', style: GoogleFonts.poppins(fontSize: 16)),
                 Text(
-                  '${widget.totalPrice.toStringAsFixed(0)} CFA',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                  '${amountToPay.toStringAsFixed(0)} CFA',
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],
             ),
@@ -98,30 +100,105 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  // --- This method now returns the PayUnitButton wrapped in padding ---
+  // --- NEW: Replaces the SegmentedButton with styled boxes ---
+  Widget _buildPaymentOptionsBoxes() {
+    return Row(
+      children: [
+        _buildPaymentOptionCard(
+          option: PaymentOption.full,
+          title: 'Pay in Full',
+          amount: '${widget.totalPrice.toStringAsFixed(0)} CFA',
+        ),
+        const SizedBox(width: 16),
+        _buildPaymentOptionCard(
+          option: PaymentOption.partial,
+          title: 'Pay 1/3 Deposit',
+          amount: '${(widget.totalPrice / 3).toStringAsFixed(0)} CFA',
+        ),
+      ],
+    );
+  }
+
+    // --- NEW: Helper widget for the styled payment option boxes ---
+  Widget _buildPaymentOptionCard({
+    required PaymentOption option,
+    required String title,
+    required String amount,
+  }) {
+    final bool isSelected = _selectedOption == option;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedOption = option;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFD9865D).withOpacity(0.1) : Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? const Color(0xFFD9865D) : Colors.grey[300]!,
+              width: 2,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: isSelected ? const Color(0xFFD9865D) : Colors.grey,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                amount,
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentExplanation() {
+    if (_selectedOption == PaymentOption.partial) {
+      final remainingAmount = widget.totalPrice - (widget.totalPrice / 3);
+      final dueDate = widget.checkInDate.subtract(const Duration(days: 1));
+      final formatter = DateFormat('MMM d, yyyy');
+
+      return Text(
+        'The remaining balance of ${remainingAmount.toStringAsFixed(0)} CFA will be due on ${formatter.format(dueDate)} (24 hours before check-in).',
+        style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+      );
+    }
+    return Text(
+      'You are paying the full amount for your stay. No further payments will be required.',
+      style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+    );
+  }
+
   Widget _buildBottomPayButton() {
+    final amountToPay = _selectedOption == PaymentOption.full ? widget.totalPrice : (widget.totalPrice / 3);
+
     return Padding(
-      // Add padding to avoid the button touching the screen edges
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       child: PayUnitButton(
-        // --- IMPORTANT: Replace with your actual PayUnit credentials ---
         apiUsername: '75d5e495-be7f-4155-b1e4-aeea2f3904eb', 
         apiPassword: '5c19e287-f828-4279-ad6c-784ba53c7fa9', 
         apiKey: 'sand_dhpF3amYmAggEAPCtwaOycyzSJC1bT',
-
-        // --- Transaction Details ---
-        totalAmount: widget.totalPrice, // Convert int to double
-        
-        // --- SDK Configuration ---
-        mode: 'test', // Use 'live' for production
+        totalAmount: amountToPay.toInt(),
+        mode: 'test',
         currency: 'XAF', 
         paymentCountry: 'CM',
-
-        // --- IMPORTANT: Replace with your actual URLs ---
         returnUrl: 'https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34', 
         notifyUrl: 'https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34',
-
-        // --- Callback after payment process ---
         actionAfterProccess: (transactionId , transactionStatus , phoneNumber) {
           print("Transaction id is : $transactionId and transaction status : $transactionStatus");
 
@@ -134,7 +211,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             // );
             print('The transaction $transactionId is Successful');
           } else {
-            
             // ScaffoldMessenger.of(context).showSnackBar(
             //   const SnackBar(
             //     content: Text('Payment Failed. Please try again.'),
