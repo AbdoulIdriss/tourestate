@@ -15,7 +15,7 @@ class CustomNavigationBar extends StatelessWidget {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'discover'),
+        BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'favorite'),
         BottomNavigationBarItem(icon: Icon(Icons.map), label: 'map'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'profile'),
       ],

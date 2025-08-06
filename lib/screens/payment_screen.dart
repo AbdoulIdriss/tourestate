@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:estate/models/appartment.dart';
+import 'package:estate/models/reservation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_payunit/flutter_payunit.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,6 +33,34 @@ enum PaymentOption { full, partial }
 class _PaymentScreenState extends State<PaymentScreen> {
   // State to track the selected payment option
   PaymentOption _selectedOption = PaymentOption.full;
+
+    // --- NEW METHOD: Saves reservation to Firestore ---
+  Future<void> _saveReservation(double amountPaid, String transactionId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return; // Should not happen if user is logged in
+
+    final newReservation = Reservation(
+      reservationId: transactionId, // Use the transaction ID as the reservation ID
+      userId: user.uid,
+      apartmentTitle: widget.apartment.title,
+      apartmentLocation: widget.apartment.location,
+      apartmentImageUrl: widget.apartment.imageUrls.first,
+      checkInDate: widget.checkInDate,
+      checkOutDate: widget.checkOutDate,
+      amountPaid: amountPaid,
+      totalPrice: widget.totalPrice.toDouble(),
+      paymentStatus: _selectedOption == PaymentOption.full ? 'Paid in Full' : 'Partial Payment',
+      reservationDate: DateTime.now(),
+    );
+
+    // Save the reservation in a subcollection for the user
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('reservations')
+        .doc(transactionId)
+        .set(newReservation.toMap());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +240,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
             //     backgroundColor: Colors.green,
             //   )
             // );
+            _saveReservation(amountToPay.toDouble(), transactionId);
             print('The transaction $transactionId is Successful');
+            Navigator.of(context).popUntil((route) => route.isFirst);
           } else {
             // ScaffoldMessenger.of(context).showSnackBar(
             //   const SnackBar(

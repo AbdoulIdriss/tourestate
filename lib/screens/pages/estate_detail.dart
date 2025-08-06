@@ -1,8 +1,10 @@
 import 'package:estate/models/appartment.dart';
+import 'package:estate/providers/favorites_provider.dart';
 import 'package:estate/screens/booking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
 
 class EstateDetail extends StatefulWidget {
@@ -46,6 +48,10 @@ class _EstateDetailState extends State<EstateDetail> {
   }
 
   Widget _buildImageGallery() {
+
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    final isFav = favoritesProvider.isFavorite(widget.apartment);
+    
     return Stack(
       children: [
         SizedBox(
@@ -82,7 +88,12 @@ class _EstateDetailState extends State<EstateDetail> {
             children: [
               _buildIconButton(icon: Icons.share_outlined, onPressed: () {}),
               const SizedBox(width: 10),
-              _buildIconButton(icon: Icons.bookmark_border, onPressed: () {}),
+              _buildIconButton(
+                icon: isFav ? Icons.bookmark : Icons.bookmark_border, // Change icon based on favorite status
+                onPressed: () {
+                  favoritesProvider.toggleFavorite(widget.apartment); // Toggle favorite status
+                },
+              ),
             ],
           ),
         ),
@@ -459,7 +470,7 @@ class _EstateDetailState extends State<EstateDetail> {
           SizedBox(
             height: 200,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.0),
+              borderRadius: BorderRadius.circular(12.0 ),
               child: GoogleMap(
                 initialCameraPosition: CameraPosition(
                   target: apartmentLocation,
