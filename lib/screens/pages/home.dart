@@ -1,4 +1,6 @@
 import 'package:estate/widgets/custom_search_bar.dart';
+import 'package:estate/widgets/filter_button.dart';
+import 'package:estate/widgets/filter_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -19,16 +21,49 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final TextEditingController _searchController = TextEditingController(); // Moved controller here
+  final TextEditingController _searchController = TextEditingController();
+  FilterCriteria _currentFilters = FilterCriteria();
 
-  // Use a nullable type for the screen list, then populate it in initState
   List<Widget>? _screens;
+
+  // Available options for filters
+  final List<String> _availableAmenities = [
+    'Swimming Pool',
+    'Free WiFi',
+    'Free Parking',
+    'Air Conditioning',
+    'Private Bathroom',
+    'BBQ Equipment',
+    'Kitchen',
+    'TV',
+    'Gym',
+    'Garden',
+    'Balcony',
+    'Laundry',
+    'Security',
+    'Elevator',
+    'Furnished',
+  ];
+
+  final List<String> _availableLocations = [
+    'Bonamoussadi, Douala',
+    'Kribi, South Region',
+    'Akwa, Douala',
+    'Dschang, West Region',
+    'Yaoundé, Centre',
+    'Bamenda, Northwest',
+    'Bafoussam, West',
+    'Limbe, Southwest',
+  ];
 
   @override
   void initState() {
     super.initState();
     _screens = <Widget>[
-      HomeContentScreen(searchController: _searchController), // Pass controller
+      HomeContentScreen(
+        searchController: _searchController,
+        filterCriteria: _currentFilters,
+      ),
       const FavoriteScreen(),
       const MapScreen(),
       const ProfileScreen(),
@@ -37,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _searchController.dispose(); // Dispose the controller when HomeScreen is disposed
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -47,9 +82,48 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Titles corresponding to each screen
+  void _showFilterDialog() async {
+    final result = await showFilterDialog(
+      context: context,
+      currentFilters: _currentFilters,
+      availableAmenities: _availableAmenities,
+      availableLocations: _availableLocations,
+    );
+
+    if (result != null) {
+      setState(() {
+        _currentFilters = result;
+        // Update the home content screen with new filters
+        _screens![0] = HomeContentScreen(
+          searchController: _searchController,
+          filterCriteria: _currentFilters,
+        );
+      });
+    }
+  }
+
+  int _getActiveFilterCount() {
+    int count = 0;
+    if (_currentFilters.minPrice > 0) count++;
+    if (_currentFilters.maxPrice < 200000) count++;
+    if (_currentFilters.minBeds != null) count++;
+    if (_currentFilters.maxBeds != null) count++;
+    if (_currentFilters.minBaths != null) count++;
+    if (_currentFilters.maxBaths != null) count++;
+    if (_currentFilters.minArea != null) count++;
+    if (_currentFilters.maxArea != null) count++;
+    if (_currentFilters.selectedAmenities.isNotEmpty) count++;
+    if (_currentFilters.minRating != null) count++;
+    if (_currentFilters.hasGarage != null) count++;
+    if (_currentFilters.selectedLocations.isNotEmpty) count++;
+    if (_currentFilters.selectedPropertyTypes.isNotEmpty) count++;
+    if (_currentFilters.selectedListingTypes.isNotEmpty) count++;
+    if (_currentFilters.hasVirtualTour != null) count++;
+    return count;
+  }
+
   static const List<String> _screenTitles = <String>[
-    'Home', // HomeContentScreen will have the search bar instead of a text title
+    'Home',
     'Favorites',
     'Map',
     'Profile',
@@ -69,40 +143,62 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         if (snapshot.hasData) {
-          // User is logged in, show the main content
           return Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
               toolbarHeight: 30,
               title: _selectedIndex == 0
                   ? null
                   : Text(
                       _screenTitles[_selectedIndex],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
               centerTitle: true,
               elevation: 0,
               backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              foregroundColor: Colors.black87,
               bottom: _selectedIndex == 0
                   ? PreferredSize(
-                      preferredSize: const Size.fromHeight(60.0), // Adjust height if necessary
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0), // Padding for the Row
+                      preferredSize: const Size.fromHeight(80.0),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Expanded( // Makes the search bar take available space
-                              child: CustomSearchBar(
-                                controller: _searchController,
+                            Expanded(
+                              child: Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: CustomSearchBar(
+                                  controller: _searchController,
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 2.0), // Space between search bar and button
-                            IconButton(
-                              icon: const Icon(Icons.filter_list),
-                              iconSize: 40, // Filter icon
-                              onPressed: () {
-                                print('Filter button pressed!');
-                              },
-                              tooltip: 'Filter', // Optional tooltip
+                            const SizedBox(width: 12.0),
+                            FilterButton(
+                              onPressed: _showFilterDialog,
+                              hasActiveFilters: _currentFilters.hasActiveFilters,
+                              activeFilterCount: _getActiveFilterCount(),
                             ),
                           ],
                         ),
@@ -110,14 +206,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   : null,
             ),
-            body: _screens![_selectedIndex], // Use _screens! because it's initialized in initState
+            body: _screens![_selectedIndex],
             bottomNavigationBar: CustomNavigationBar(
               selectedIndex: _selectedIndex,
               onItemTapped: _onItemTapped,
             ),
           );
         } else {
-          // User is NOT logged in, show the authentication screen
           return const AuthScreen();
         }
       },

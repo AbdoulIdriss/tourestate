@@ -10,7 +10,7 @@ class MapScreen extends StatelessWidget {
       color: Colors.white,
       alignment: Alignment.center,
       child: const Text(
-        'Map Content Screen',
+        'Map Coming Soon',
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:estate/models/appartment.dart';
+import 'package:estate/models/property.dart';
 import 'package:estate/screens/payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,9 +6,9 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
 class BookingScreen extends StatefulWidget {
-  final Apartment apartment;
+  final Property property;
 
-  const BookingScreen({super.key, required this.apartment});
+  const BookingScreen({super.key, required this.property});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -37,7 +37,7 @@ class _BookingScreenState extends State<BookingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildApartmentSummary(),
+            _buildpropertySummary(),
             const SizedBox(height: 24),
             _buildGuestSummary(),
             const SizedBox(height: 24),
@@ -51,7 +51,7 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  Widget _buildApartmentSummary() {
+  Widget _buildpropertySummary() {
     return Card(
       elevation: 0,
       color: Colors.grey[100],
@@ -62,7 +62,7 @@ class _BookingScreenState extends State<BookingScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Image.network(
-                widget.apartment.imageUrls.first,
+                widget.property.imageUrls.first,
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
@@ -74,12 +74,12 @@ class _BookingScreenState extends State<BookingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.apartment.title,
+                    widget.property.title,
                     style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Hosted by ${widget.apartment.ownerName}',
+                    'Hosted by ${widget.property.ownerName}',
                     style: GoogleFonts.poppins(color: Colors.grey[600]),
                   ),
                 ],
@@ -285,7 +285,7 @@ class _BookingScreenState extends State<BookingScreen> {
     final numberOfNights = _rangeEnd!.difference(_rangeStart!).inDays;
     if (numberOfNights <= 0) return const SizedBox.shrink();
 
-    final totalPrice = numberOfNights * widget.apartment.pricePerNight;
+    final totalPrice = numberOfNights * widget.property.price;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,7 +296,7 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
         const SizedBox(height: 12),
         _buildSummaryRow(
-          '${widget.apartment.pricePerNight.toStringAsFixed(0)} CFA x $numberOfNights night${numberOfNights > 1 ? 's' : ''}',
+          '${widget.property.price.toStringAsFixed(0)} CFA x $numberOfNights night${numberOfNights > 1 ? 's' : ''}',
           '${totalPrice.toStringAsFixed(0)} CFA'
         ),
         const Divider(height: 24),
@@ -325,7 +325,7 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget _buildProceedButton() {
     final bool canProceed = _rangeStart != null && _rangeEnd != null;
     final int numberOfNights = canProceed ? _rangeEnd!.difference(_rangeStart!).inDays : 0;
-    final int totalPrice = numberOfNights * widget.apartment.pricePerNight;
+    final int totalPrice = numberOfNights * widget.property.price;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -334,7 +334,7 @@ class _BookingScreenState extends State<BookingScreen> {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => PaymentScreen(
-                apartment: widget.apartment,
+                property: widget.property,
                 totalPrice: totalPrice,
                 numberOfNights: numberOfNights,
                 checkInDate: _rangeStart!,

@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Reservation {
   final String reservationId;
   final String userId;
-  final String apartmentTitle;
-  final String apartmentLocation;
-  final String apartmentImageUrl;
+  final String propertyTitle;
+  final String propertyLocation;
+  final String propertyImageUrl;
   final DateTime checkInDate;
   final DateTime checkOutDate;
   final double amountPaid;
@@ -16,9 +16,9 @@ class Reservation {
   Reservation({
     required this.reservationId,
     required this.userId,
-    required this.apartmentTitle,
-    required this.apartmentLocation,
-    required this.apartmentImageUrl,
+    required this.propertyTitle,
+    required this.propertyLocation,
+    required this.propertyImageUrl,
     required this.checkInDate,
     required this.checkOutDate,
     required this.amountPaid,
@@ -31,9 +31,9 @@ class Reservation {
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
-      'apartmentTitle': apartmentTitle,
-      'apartmentLocation': apartmentLocation,
-      'apartmentImageUrl': apartmentImageUrl,
+      'propertyTitle': propertyTitle,
+      'propertyLocation': propertyLocation,
+      'propertyImageUrl': propertyImageUrl,
       'checkInDate': Timestamp.fromDate(checkInDate),
       'checkOutDate': Timestamp.fromDate(checkOutDate),
       'amountPaid': amountPaid,

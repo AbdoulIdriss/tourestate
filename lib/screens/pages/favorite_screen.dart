@@ -10,7 +10,7 @@ class FavoriteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Watch the FavoritesProvider to rebuild when the favorites list changes
     final favoritesProvider = Provider.of<FavoritesProvider>(context);
-    final favoriteApartments = favoritesProvider.favorites;
+    final favoriteProperties = favoritesProvider.favorites; // Changed from favoriteApartments to favoriteProperties
 
     return Scaffold(
       appBar: AppBar(
@@ -23,7 +23,7 @@ class FavoriteScreen extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      body: favoriteApartments.isEmpty
+      body: favoriteProperties.isEmpty
           ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -44,7 +44,7 @@ class FavoriteScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Add apartments to your favorites to see them here.',
+                    'Add properties to your favorites to see them here.', // Changed from "apartments" to "properties"
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -55,10 +55,10 @@ class FavoriteScreen extends StatelessWidget {
               ),
             )
           : ListView.builder(
-              itemCount: favoriteApartments.length,
+              itemCount: favoriteProperties.length,
               itemBuilder: (context, index) {
-                final apartment = favoriteApartments[index];
-                return EstateCards(apartment: apartment); // Reuse your existing EstateCards widget
+                final property = favoriteProperties[index]; // Changed from apartment to property
+                return EstateCards(property: property); // Updated parameter name - check your EstateCards widget
               },
             ),
     );

@@ -1,5 +1,3 @@
-// widgets/custom_search_bar.dart
-
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatelessWidget {
@@ -12,24 +10,61 @@ class CustomSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-      child: SearchBar(
-        controller: controller,
-        hintText: 'Search',
-        // Re-introduce the search icon and adjust padding to simulate centering
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 10.0), // Adjust this padding
-          child: Icon(Icons.search),
+    return SearchBar(
+      controller: controller,
+      hintText: 'Search by location, amenities, or type...',
+      hintStyle: WidgetStateProperty.all<TextStyle>(
+        TextStyle(
+          color: Colors.grey[500],
+          fontSize: 16,
         ),
-        trailing: const <Widget>[],
-        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-          const EdgeInsets.symmetric(
-            horizontal: 0, // This padding primarily affects text if leading/trailing are used
-            vertical: 8, // Controls height
-          ),
+      ),
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 12.0),
+        child: Icon(
+          Icons.search,
+          color: Colors.grey[600],
+          size: 22,
         ),
-        // No textAlign for SearchBar directly
+      ),
+      trailing: controller?.text.isNotEmpty == true 
+          ? [
+              IconButton(
+                icon: const Icon(Icons.clear),
+                iconSize: 20,
+                color: Colors.grey[600],
+                onPressed: () {
+                  controller?.clear();
+                },
+                tooltip: 'Clear search',
+              ),
+            ]
+          : const <Widget>[],
+      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+        const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12, // Adjusted for better height
+        ),
+      ),
+      backgroundColor: WidgetStateProperty.all<Color>(Colors.grey[50]!),
+      surfaceTintColor: WidgetStateProperty.all<Color>(Colors.transparent),
+      elevation: WidgetStateProperty.all<double>(0),
+      side: WidgetStateProperty.all<BorderSide>(
+        BorderSide(
+          color: Colors.grey[300]!,
+          width: 1,
+        ),
+      ),
+      shape: WidgetStateProperty.all<OutlinedBorder>(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      textStyle: WidgetStateProperty.all<TextStyle>(
+        const TextStyle(
+          fontSize: 16,
+          color: Colors.black87,
+        ),
       ),
     );
   }

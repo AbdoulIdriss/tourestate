@@ -1,5 +1,5 @@
 import 'package:estate/models/reservation.dart';
-import 'package:estate/screens/auth_screen.dart'; // Make sure you have this import
+import 'package:estate/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,26 +21,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Reservation(
       reservationId: 'trans_12345',
       userId: 'mock_user_id',
-      apartmentTitle: 'Modern Family House',
-      apartmentLocation: 'Bonamoussadi, Douala',
-      apartmentImageUrl: 'https://i.pinimg.com/736x/d4/7b/e2/d47be28251f9931b33fb37816bc32143.jpg',
+      propertyTitle: 'Modern Family House',
+      propertyLocation: 'Bonamoussadi, Douala',
+      propertyImageUrl: 'https://i.pinimg.com/736x/d4/7b/e2/d47be28251f9931b33fb37816bc32143.jpg',
       checkInDate: DateTime.now().add(const Duration(days: 10)),
       checkOutDate: DateTime.now().add(const Duration(days: 15)),
-      amountPaid: 80,
-      totalPrice: 400,
+      amountPaid: 8000,
+      totalPrice: 26000,
       paymentStatus: 'Partial Payment',
       reservationDate: DateTime.now().subtract(const Duration(days: 2)),
     ),
     Reservation(
       reservationId: 'trans_67890',
       userId: 'mock_user_id',
-      apartmentTitle: 'Luxury Beachside Villa',
-      apartmentLocation: 'Kribi, South Region',
-      apartmentImageUrl: 'https://i.pinimg.com/736x/ba/e4/a4/bae4a4ba046305ff112d4872374ca751.jpg',
+      propertyTitle: 'Luxury Beachside Villa',
+      propertyLocation: 'Kribi, South Region',
+      propertyImageUrl: 'https://i.pinimg.com/736x/ba/e4/a4/bae4a4ba046305ff112d4872374ca751.jpg',
       checkInDate: DateTime.now().subtract(const Duration(days: 20)),
       checkOutDate: DateTime.now().subtract(const Duration(days: 15)),
-      amountPaid: 750,
-      totalPrice: 750,
+      amountPaid: 75000,
+      totalPrice: 75000,
       paymentStatus: 'Paid in Full',
       reservationDate: DateTime.now().subtract(const Duration(days: 30)),
     ),
@@ -176,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    reservation.apartmentImageUrl,
+                    reservation.propertyImageUrl,
                     width: 70,
                     height: 70,
                     fit: BoxFit.cover,
@@ -188,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        reservation.apartmentTitle,
+                        reservation.propertyTitle,
                         style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),

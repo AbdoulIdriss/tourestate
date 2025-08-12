@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:estate/models/appartment.dart';
+import 'package:estate/models/property.dart';
 import 'package:estate/models/reservation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
  
 
 class PaymentScreen extends StatefulWidget {
-  final Apartment apartment;
+  final Property property;
   final int totalPrice;
   final int numberOfNights;
   final DateTime checkInDate;
@@ -17,7 +17,7 @@ class PaymentScreen extends StatefulWidget {
 
   const PaymentScreen({
     super.key,
-    required this.apartment,
+    required this.property,
     required this.totalPrice,
     required this.numberOfNights,
     required this.checkInDate,
@@ -42,9 +42,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final newReservation = Reservation(
       reservationId: transactionId, // Use the transaction ID as the reservation ID
       userId: user.uid,
-      apartmentTitle: widget.apartment.title,
-      apartmentLocation: widget.apartment.location,
-      apartmentImageUrl: widget.apartment.imageUrls.first,
+      propertyTitle: widget.property.title,
+      propertyLocation: widget.property.location,
+      propertyImageUrl: widget.property.imageUrls.first,
       checkInDate: widget.checkInDate,
       checkOutDate: widget.checkOutDate,
       amountPaid: amountPaid,
@@ -102,7 +102,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.apartment.title, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(widget.property.title, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Row(
               children: [

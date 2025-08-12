@@ -1,21 +1,21 @@
-import 'package:estate/models/appartment.dart';
 import 'package:flutter/foundation.dart';
+import 'package:estate/models/property.dart';
 
 class FavoritesProvider with ChangeNotifier {
-  final List<Apartment> _favorites = [];
+  final List<Property> _favorites = [];
 
-  List<Apartment> get favorites => _favorites;
+  List<Property> get favorites => _favorites;
 
-  void toggleFavorite(Apartment apartment) {
-    if (_favorites.contains(apartment)) {
-      _favorites.remove(apartment);
+  void toggleFavorite(Property property) {
+    if (_favorites.contains(property)) {
+      _favorites.remove(property);
     } else {
-      _favorites.add(apartment);
+      _favorites.add(property);
     }
     notifyListeners(); // Notify listeners that the list has changed
   }
 
-  bool isFavorite(Apartment apartment) {
-    return _favorites.contains(apartment);
+  bool isFavorite(Property property) {
+    return _favorites.contains(property);
   }
 }
