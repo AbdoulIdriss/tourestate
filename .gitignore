@@ -52,6 +52,10 @@ android/app/src/main/res/values/secrets.xml
 ios/Runner/Secrets.plist
 macos/Runner/Secrets.plist
 
+# Template files (safe to commit)
+!android/app/src/main/res/values/templates/
+!ios/Runner/templates/
+
 # Environment files
 .env
 .env.local

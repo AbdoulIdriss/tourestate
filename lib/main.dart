@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'package:estate/services/debug_utility.dart';
 
 import 'package:estate/screens/pages/home.dart';
 
@@ -11,17 +10,13 @@ import 'package:estate/screens/pages/home.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-  
-);
-  
-  // Debug: Check and fix properties
-  await DebugUtility.checkAndFixProperties();
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   
   runApp(
     ChangeNotifierProvider( // Wrap with ChangeNotifierProvider
       create: (context) => FavoritesProvider(), // Create an instance of your provider
-    child : const MyApp(),
+      child: const MyApp(),
     ),
   );
 }
