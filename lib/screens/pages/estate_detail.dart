@@ -1,6 +1,7 @@
 import 'package:estate/models/property.dart';
 import 'package:estate/providers/favorites_provider.dart';
 import 'package:estate/screens/booking_screen.dart';
+import 'package:estate/utils/auth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -98,8 +99,14 @@ class _EstateDetailState extends State<EstateDetail> {
               const SizedBox(width: 10),
               _buildIconButton(
                 icon: isFav ? Icons.bookmark : Icons.bookmark_border,
-                onPressed: () {
-                  favoritesProvider.toggleFavorite(widget.property);
+                onPressed: () async {
+                  final isAuthenticated = await AuthUtils.requireAuthentication(
+                    context,
+                    'add this property to favorites',
+                  );
+                  if (isAuthenticated) {
+                    favoritesProvider.toggleFavorite(widget.property);
+                  }
                 },
               ),
             ],
@@ -401,7 +408,15 @@ class _EstateDetailState extends State<EstateDetail> {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
-                onTap: () => _launchVirtualTour(),
+                onTap: () async {
+                  final isAuthenticated = await AuthUtils.requireAuthentication(
+                    context,
+                    'view the virtual tour',
+                  );
+                  if (isAuthenticated) {
+                    _launchVirtualTour();
+                  }
+                },
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -829,16 +844,27 @@ class _EstateDetailState extends State<EstateDetail> {
             ],
           ),
           ElevatedButton(
-            onPressed: () {
-              if (widget.property.listingType == ListingType.rent) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        BookingScreen(property: widget.property),
-                  ),
-                );
-              } else {
-                _showContactOwnerDialog();
+            onPressed: () async {
+              final action = widget.property.listingType == ListingType.rent
+                  ? 'book this property'
+                  : 'contact the owner';
+              
+              final isAuthenticated = await AuthUtils.requireAuthentication(
+                context,
+                action,
+              );
+              
+              if (isAuthenticated) {
+                if (widget.property.listingType == ListingType.rent) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          BookingScreen(property: widget.property),
+                    ),
+                  );
+                } else {
+                  _showContactOwnerDialog();
+                }
               }
             },
             style: ElevatedButton.styleFrom(
@@ -897,14 +923,22 @@ class _EstateDetailState extends State<EstateDetail> {
               child: Text('Cancel', style: GoogleFonts.poppins()),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Contact information sent to your email'),
-                    backgroundColor: Colors.green,
-                  ),
+                
+                final isAuthenticated = await AuthUtils.requireAuthentication(
+                  context,
+                  'contact the owner',
                 );
+                
+                if (isAuthenticated) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Contact information sent to your email'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD9865D),

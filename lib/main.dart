@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'package:estate/services/debug_utility.dart';
 
 import 'package:estate/screens/pages/home.dart';
 
@@ -13,6 +14,10 @@ void main() async{
   options: DefaultFirebaseOptions.currentPlatform,
   
 );
+  
+  // Debug: Check and fix properties
+  await DebugUtility.checkAndFixProperties();
+  
   runApp(
     ChangeNotifierProvider( // Wrap with ChangeNotifierProvider
       create: (context) => FavoritesProvider(), // Create an instance of your provider
@@ -36,6 +41,6 @@ class MyApp extends StatelessWidget {
       ),
       home: const HomeScreen(),
     );
-  }
+   }
   
 }

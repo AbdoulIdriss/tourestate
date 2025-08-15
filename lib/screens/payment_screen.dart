@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:estate/models/property.dart';
 import 'package:estate/models/reservation.dart';
+import 'package:estate/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_payunit/flutter_payunit.dart';
@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 
 class PaymentScreen extends StatefulWidget {
   final Property property;
-  final int totalPrice;
+  final double totalPrice;
   final int numberOfNights;
   final DateTime checkInDate;
   final DateTime checkOutDate;
@@ -35,32 +35,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
   PaymentOption _selectedOption = PaymentOption.full;
 
     // --- NEW METHOD: Saves reservation to Firestore ---
-  Future<void> _saveReservation(double amountPaid, String transactionId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return; // Should not happen if user is logged in
+Future<void> _saveReservation(double amountPaid, String transactionId) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
 
-    final newReservation = Reservation(
-      reservationId: transactionId, // Use the transaction ID as the reservation ID
-      userId: user.uid,
-      propertyTitle: widget.property.title,
-      propertyLocation: widget.property.location,
-      propertyImageUrl: widget.property.imageUrls.first,
-      checkInDate: widget.checkInDate,
-      checkOutDate: widget.checkOutDate,
-      amountPaid: amountPaid,
-      totalPrice: widget.totalPrice.toDouble(),
-      paymentStatus: _selectedOption == PaymentOption.full ? 'Paid in Full' : 'Partial Payment',
-      reservationDate: DateTime.now(),
-    );
+  final newReservation = Reservation(
+    reservationId: transactionId,
+    userId: user.uid,
+    propertyTitle: widget.property.title,
+    propertyLocation: widget.property.location,
+    propertyImageUrl: widget.property.imageUrls.first,
+    checkInDate: widget.checkInDate,
+    checkOutDate: widget.checkOutDate,
+    amountPaid: amountPaid,
+    totalPrice: widget.totalPrice.toDouble(),
+    paymentStatus: _selectedOption == PaymentOption.full ? 'Paid in Full' : 'Partial Payment',
+    reservationDate: DateTime.now(),
+  );
 
-    // Save the reservation in a subcollection for the user
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('reservations')
-        .doc(transactionId)
-        .set(newReservation.toMap());
-  }
+  // Use the FirebaseService instead of direct Firestore calls
+  await FirebaseService.saveReservation(newReservation);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +162,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFD9865D).withOpacity(0.1) : Colors.grey[100],
+            color: isSelected ? const Color(0xFFD9865D).withValues(alpha: 0.1) : Colors.grey[100],
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected ? const Color(0xFFD9865D) : Colors.grey[300]!,

@@ -325,7 +325,7 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget _buildProceedButton() {
     final bool canProceed = _rangeStart != null && _rangeEnd != null;
     final int numberOfNights = canProceed ? _rangeEnd!.difference(_rangeStart!).inDays : 0;
-    final int totalPrice = numberOfNights * widget.property.price;
+    final double totalPrice = numberOfNights * widget.property.price;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),

@@ -20,7 +20,7 @@ class FilterCriteria {
 
   FilterCriteria({
     this.minPrice = 0,
-    this.maxPrice = 200000,
+    this.maxPrice = 500000000, // 500M CFA to accommodate both rent and sale properties
     this.minBeds,
     this.maxBeds,
     this.minBaths,
@@ -74,7 +74,7 @@ class FilterCriteria {
 
   bool get hasActiveFilters {
     return minPrice > 0 ||
-        maxPrice < 200000 ||
+        // Don't count maxPrice as active filter since it's set to a very high default
         minBeds != null ||
         maxBeds != null ||
         minBaths != null ||
@@ -387,7 +387,7 @@ class _FilterDialogState extends State<FilterDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Price Range (FCFA per night)'),
+        _buildSectionHeader('Price Range (FCFA)'),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
@@ -430,7 +430,7 @@ class _FilterDialogState extends State<FilterDialog> {
               RangeSlider(
                 values: RangeValues(_filters.minPrice, _filters.maxPrice),
                 min: 0,
-                max: 200000,
+                max: 500000000,
                 divisions: 20,
                 activeColor: Colors.orange.shade600,
                 inactiveColor: Colors.orange.shade200,

@@ -5,7 +5,7 @@ import 'package:estate/widgets/social_login_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // <-- Import Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -26,7 +26,7 @@ class _AuthScreenState extends State<AuthScreen> {
     });
   }
 
-  // --- FIREBASE INTEGRATION (NOW FULLY FUNCTIONAL) ---
+  // --- FIREBASE INTEGRATION ---
   void _submitAuthForm({
     required String email,
     required String password,

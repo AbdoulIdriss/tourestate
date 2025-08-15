@@ -1,6 +1,7 @@
 import 'package:estate/models/property.dart';
 import 'package:estate/providers/favorites_provider.dart';
 import 'package:estate/screens/pages/estate_detail.dart';
+import 'package:estate/utils/auth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -115,7 +116,15 @@ class EstateCards extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: GestureDetector(
-                    onTap: () => favoritesProvider.toggleFavorite(property),
+                    onTap: () async {
+                      final isAuthenticated = await AuthUtils.requireAuthentication(
+                        context,
+                        'add this property to favorites',
+                      );
+                      if (isAuthenticated) {
+                        favoritesProvider.toggleFavorite(property);
+                      }
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(

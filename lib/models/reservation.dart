@@ -1,3 +1,4 @@
+// models/reservation.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Reservation {
@@ -27,9 +28,10 @@ class Reservation {
     required this.reservationDate,
   });
 
-    // A method to convert a reservation object to a map for Firestore
+  // Convert to Firestore Map
   Map<String, dynamic> toMap() {
     return {
+      'reservationId': reservationId, // Include reservationId in the map
       'userId': userId,
       'propertyTitle': propertyTitle,
       'propertyLocation': propertyLocation,
@@ -42,4 +44,53 @@ class Reservation {
       'reservationDate': Timestamp.fromDate(reservationDate),
     };
   }
+
+  // Create from Firestore Map
+  factory Reservation.fromMap(Map<String, dynamic> map) {
+    return Reservation(
+      reservationId: map['reservationId'] ?? '',
+      userId: map['userId'] ?? '',
+      propertyTitle: map['propertyTitle'] ?? '',
+      propertyLocation: map['propertyLocation'] ?? '',
+      propertyImageUrl: map['propertyImageUrl'] ?? '',
+      checkInDate: (map['checkInDate'] as Timestamp).toDate(),
+      checkOutDate: (map['checkOutDate'] as Timestamp).toDate(),
+      amountPaid: (map['amountPaid'] ?? 0.0).toDouble(),
+      totalPrice: (map['totalPrice'] ?? 0.0).toDouble(),
+      paymentStatus: map['paymentStatus'] ?? '',
+      reservationDate: (map['reservationDate'] as Timestamp).toDate(),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Reservation &&
+          runtimeType == other.runtimeType &&
+          reservationId == other.reservationId &&
+          userId == other.userId &&
+          propertyTitle == other.propertyTitle &&
+          propertyLocation == other.propertyLocation &&
+          propertyImageUrl == other.propertyImageUrl &&
+          checkInDate == other.checkInDate &&
+          checkOutDate == other.checkOutDate &&
+          amountPaid == other.amountPaid &&
+          totalPrice == other.totalPrice &&
+          paymentStatus == other.paymentStatus &&
+          reservationDate == other.reservationDate;
+
+  @override
+  int get hashCode => Object.hash(
+        reservationId,
+        userId,
+        propertyTitle,
+        propertyLocation,
+        propertyImageUrl,
+        checkInDate,
+        checkOutDate,
+        amountPaid,
+        totalPrice,
+        paymentStatus,
+        reservationDate,
+      );
 }
